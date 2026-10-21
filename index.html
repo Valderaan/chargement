@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Valderaan · Chargement</title>
+  <link rel="preload" href="fonts/cinzel-decorative-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/eb-garamond-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Décor : diaporama, étalonnage, particules, bandes de runes -->
+  <div id="scene" aria-hidden="true">
+    <div id="diaporama"></div>
+    <div class="etalonnage"></div>
+    <canvas id="essences"></canvas>
+    <div class="bande bande-g"></div>
+    <div class="bande bande-d"></div>
+  </div>
+
+  <main id="ui">
+
+    <!-- En-tête : sceau animé + titre -->
+    <header id="entete">
+      <div class="sceau">
+        <img class="sceau-runes"    src="images/ui/runes-cercle-bleu.png" alt="">
+        <img class="sceau-aura"     src="images/ui/logo-aura.webp" alt="">
+        <img class="sceau-essence"  src="images/ui/logo-essence.webp" alt="">
+        <img class="sceau-cercle"   src="images/ui/logo-cercle.webp" alt="">
+        <img class="sceau-aiguille" src="images/ui/logo-aiguille.webp" alt="">
+        <img class="sceau-v"        src="images/ui/logo-v.webp" alt="Valderaan">
+      </div>
+      <div class="entete-texte">
+        <h1 id="titre">Valderaan</h1>
+        <div class="devise-bloc">
+          <p id="devise" class="devise"></p>
+          <div class="filet"><span></span><i></i><span></span></div>
+        </div>
+        <p id="message" class="message"></p>
+      </div>
+    </header>
+
+    <!-- Parchemin du tournoi -->
+    <aside id="parchemin">
+      <div class="parchemin-contenu">
+        <div class="p-entete">
+          <p class="p-surtitre" id="t-surtitre"></p>
+          <img class="p-filet-haut" src="images/ui/parchemin-filet.png" alt="">
+          <h2 class="p-titre" id="t-titre"></h2>
+          <p class="p-soustitre" id="t-soustitre"></p>
+        </div>
+        <div class="p-date">
+          <span id="t-date"></span>
+          <span class="p-heure" id="t-heure"></span>
+          <span class="p-lieu" id="t-lieu"></span>
+        </div>
+        <div class="p-filet"></div>
+        <dl class="p-lignes" id="t-lignes"></dl>
+        <div class="p-paragraphes" id="t-paragraphes"></div>
+        <ul class="p-regles" id="t-regles"></ul>
+        <p class="p-pied" id="t-pied"></p>
+        <p class="p-discord" id="t-discord"></p>
+      </div>
+    </aside>
+
+    <!-- Lecteur de musique -->
+    <div id="musique">
+      <button id="m-basculer" type="button" title="Couper / remettre la musique">
+        <span class="m-icone">
+          <img src="images/ui/runes-cercle-or.png" alt="">
+          <svg viewBox="0 0 24 24" class="m-on"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="onde" d="M16 8.5a4.5 4.5 0 0 1 0 7"/><path class="onde" d="M18.5 6a8 8 0 0 1 0 12"/></svg>
+          <svg viewBox="0 0 24 24" class="m-off"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="barre" d="M16 9l5 6M21 9l-5 6"/></svg>
+        </span>
+        <span class="m-texte">
+          <span class="m-label">Musique</span>
+          <span class="m-titre" id="m-titre">—</span>
+        </span>
+        <span class="m-eq"><i></i><i></i><i></i><i></i></span>
+      </button>
+      <button id="m-suivante" type="button" title="Musique suivante">
+        <svg viewBox="0 0 24 24"><path d="M5 6l9 6-9 6z"/><path d="M16 6h2.5v12H16z"/></svg>
+      </button>
+    </div>
+
+    <!-- Bas d'écran : chroniques + progression -->
+    <footer id="bas">
+      <section id="chroniques">
+        <p class="c-label"><img src="images/ui/runes-cercle-or.png" alt=""> Chroniques de Valderaan</p>
+        <p class="c-texte" id="c-texte"></p>
+        <div class="c-temps"><span id="c-temps"></span></div>
+      </section>
+
+      <section id="progression">
+        <div class="pr-tete">
+          <span id="pr-etape">Le portail s'éveille…</span>
+          <span id="pr-pourcent">0 %</span>
+        </div>
+        <div class="pr-barre">
+          <img class="pr-embout g" src="images/ui/runes-cercle-or.png" alt="">
+          <div class="pr-rail">
+            <div class="pr-remplissage" id="pr-remplissage"><div class="pr-reflet"></div></div>
+            <div class="pr-etincelle" id="pr-etincelle"></div>
+          </div>
+          <img class="pr-embout d" src="images/ui/runes-cercle-or.png" alt="">
+        </div>
+        <div class="pr-pied">
+          <span id="pr-fichier">&nbsp;</span>
+          <span id="pr-compteur"></span>
+        </div>
+      </section>
+    </footer>
+
+    <div id="serveur"></div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,466 @@
+/* =====================================================================
+   VALDERAAN · Écran de chargement — styles
+   Cible : navigateur intégré de GMod (Chromium 86). Pas de propriétés
+   CSS plus récentes (inset, aspect-ratio, :is…).
+   ===================================================================== */
+
+@font-face { font-family: "Cinzel Decorative"; font-weight: 400; src: url(fonts/cinzel-decorative-latin-400-normal.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "Cinzel Decorative"; font-weight: 700; src: url(fonts/cinzel-decorative-latin-700-normal.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "Cinzel Decorative"; font-weight: 900; src: url(fonts/cinzel-decorative-latin-900-normal.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "Cinzel"; font-weight: 400; src: url(fonts/cinzel-latin-400-normal.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "Cinzel"; font-weight: 600; src: url(fonts/cinzel-latin-600-normal.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "Cinzel"; font-weight: 700; src: url(fonts/cinzel-latin-700-normal.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "EB Garamond"; font-weight: 400; src: url(fonts/eb-garamond-latin-400-normal.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "EB Garamond"; font-weight: 500; src: url(fonts/eb-garamond-latin-500-normal.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "EB Garamond"; font-weight: 600; src: url(fonts/eb-garamond-latin-600-normal.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "EB Garamond"; font-weight: 400; font-style: italic; src: url(fonts/eb-garamond-latin-400-italic.woff2) format("woff2"); font-display: swap; }
+
+:root {
+  --or: #e9b955;
+  --or-clair: #ffe2a0;
+  --or-sombre: #8a6424;
+  --violet: #9a52f0;
+  --bleu-nuit: #070b1f;
+  --encre: #3a200e;
+  --encre-rouge: #6e2414;
+  --parchemin-texte: #4a2c14;
+  --ivoire: #f3e7cc;
+  --bande-x: 0.6vw;                 /* position des frises runiques */
+  --bande-w: 8.3vh;                 /* largeur des frises */
+  --marge-x: calc(var(--bande-x) + var(--bande-w) + 2.6vh); /* tout le contenu reste à l'intérieur des frises */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bleu-nuit);
+  color: var(--ivoire);
+  font-family: "EB Garamond", Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* ---------- Décor ---------- */
+
+#scene, #diaporama, .etalonnage, #essences, #ui {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+}
+
+.vue {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-size: cover; background-position: center;
+  opacity: 0;
+  transition: opacity 2.2s ease;
+  will-change: transform, opacity;
+}
+.vue.active { opacity: 1; }
+
+/* Effet « Ken Burns » : zoom et travelling lents, 4 variantes */
+@keyframes kb-zoom-in   { from { transform: scale(1.04) translate(0, 0); }      to { transform: scale(1.18) translate(-1.5%, -1%); } }
+@keyframes kb-zoom-out  { from { transform: scale(1.20) translate(1.5%, 1%); }  to { transform: scale(1.05) translate(0, 0); } }
+@keyframes kb-pan-droite{ from { transform: scale(1.14) translate(-3%, 0.5%); } to { transform: scale(1.14) translate(3%, -0.5%); } }
+@keyframes kb-pan-gauche{ from { transform: scale(1.14) translate(3%, -0.5%); } to { transform: scale(1.14) translate(-3%, 0.5%); } }
+
+.etalonnage {
+  background:
+    radial-gradient(ellipse 85% 75% at 50% 45%, rgba(0,0,0,0) 40%, rgba(3,4,14,.72) 100%),
+    linear-gradient(to top, rgba(4,5,16,.92) 0%, rgba(4,5,16,.55) 22%, rgba(4,5,16,0) 42%),
+    linear-gradient(to right, rgba(4,5,16,.7) 0%, rgba(4,5,16,.15) 45%, rgba(4,5,16,0) 60%),
+    linear-gradient(to bottom, rgba(4,5,16,.55) 0%, rgba(4,5,16,0) 25%),
+    linear-gradient(rgba(60,40,120,.12), rgba(120,70,20,.10));
+}
+
+#essences { pointer-events: none; }
+
+.bande {
+  position: fixed; top: 0; bottom: 0;
+  width: var(--bande-w);
+  background: url(images/ui/runes-bande-violet.png) repeat-y center top;
+  background-size: 8.3vh 23.334vh; /* tuile sans raccord : 8 glyphes au pas régulier */
+  opacity: .30;
+  filter: drop-shadow(0 0 .6vh rgba(154, 82, 240, .9));
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 9%, #000 91%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 9%, #000 91%, transparent 100%);
+}
+.bande-g { left: var(--bande-x);  animation: bande-monte 24s linear infinite; }
+.bande-d { right: var(--bande-x); animation: bande-descend 24s linear infinite; }
+@keyframes bande-monte   { from { background-position: center 0; } to { background-position: center -23.334vh; } }
+@keyframes bande-descend { from { background-position: center 0; } to { background-position: center 23.334vh; } }
+
+/* ---------- En-tête ---------- */
+
+#entete {
+  position: absolute; left: calc(var(--marge-x) + 4.75vh); top: 5vh; /* 4.75vh = débord de l'anneau runique */
+  display: flex; align-items: center;
+  max-width: 54vw;
+  animation: apparition 1.6s ease-out both;
+}
+
+.sceau {
+  position: relative; flex: 0 0 auto;
+  width: 25vh; height: 25vh;
+  margin-right: calc(4.75vh + 2.6vh); /* débord de l'anneau + même écart que côté frise : logo centré entre frise et texte */
+}
+.sceau img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.sceau .sceau-runes {
+  top: -19%; left: -19%; width: 138%; height: 138%;
+  opacity: .6;
+  filter: drop-shadow(0 0 .8vh rgba(90, 130, 255, .95));
+  animation: tourne 140s linear infinite;
+}
+.sceau .sceau-aura     { animation: aura 6s ease-in-out infinite; }
+.sceau .sceau-essence  { animation: tourne 70s linear infinite; opacity: .95; }
+.sceau .sceau-cercle   { animation: tourne-inverse 110s linear infinite; }
+.sceau .sceau-aiguille { animation: boussole 16s ease-in-out infinite; }
+.sceau .sceau-v        { filter: drop-shadow(0 0.6vh 1.2vh rgba(0,0,0,.6)); animation: lueur-v 5s ease-in-out infinite; }
+
+@keyframes tourne         { to { transform: rotate(360deg); } }
+@keyframes tourne-inverse { to { transform: rotate(-360deg); } }
+@keyframes aura { 0%,100% { transform: scale(.94); opacity: .55; } 50% { transform: scale(1.06); opacity: .95; } }
+@keyframes boussole {
+  0%   { transform: rotate(0deg); }
+  14%  { transform: rotate(28deg); }
+  22%  { transform: rotate(-12deg); }
+  30%  { transform: rotate(6deg); }
+  38%  { transform: rotate(0deg); }
+  55%  { transform: rotate(90deg); }
+  63%  { transform: rotate(78deg); }
+  70%  { transform: rotate(-90deg); }
+  80%  { transform: rotate(-70deg); }
+  92%  { transform: rotate(4deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes lueur-v {
+  0%,100% { filter: drop-shadow(0 .6vh 1.2vh rgba(0,0,0,.6)) drop-shadow(0 0 .4vh rgba(255,200,90,.15)); }
+  50%     { filter: drop-shadow(0 .6vh 1.2vh rgba(0,0,0,.6)) drop-shadow(0 0 1.6vh rgba(255,200,90,.55)); }
+}
+
+h1#titre {
+  font-family: "Cinzel Decorative", serif; font-weight: 900;
+  text-transform: uppercase;
+  font-size: 8vh; line-height: 1; letter-spacing: .04em;
+  background: url(images/ui/texture-or.jpg) center / 30vh, linear-gradient(#ffe6a8, #c8902f);
+  background-blend-mode: hard-light;
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 .3vh 0 rgba(60,30,5,.9)) drop-shadow(0 0 2vh rgba(255,190,80,.35));
+}
+.devise {
+  margin-top: 1.2vh;
+  font-family: "Cinzel", serif; font-weight: 600;
+  font-size: 1.9vh; letter-spacing: .13em; text-transform: uppercase;
+  color: #ead6a8;
+  text-shadow: 0 0 1.2vh rgba(0,0,0,.9);
+}
+/* Bloc devise + filet : le filet se centre sous la devise.
+   Réglages : width = longueur du filet, margin = espace au-dessus / en dessous. */
+.devise-bloc { display: inline-flex; flex-direction: column; align-items: center; }
+.filet { display: flex; align-items: center; margin: 1.8vh 0 1.6vh; width: 34vh; }
+.filet span { flex: 1; height: 1px; background: linear-gradient(to right, rgba(233,185,85,0), var(--or), rgba(233,185,85,0)); }
+.filet i { width: 1vh; height: 1vh; margin: 0 1.2vh; transform: rotate(45deg); border: 1px solid var(--or); box-shadow: 0 0 1vh rgba(233,185,85,.8); }
+.message {
+  font-style: italic; font-size: 2.35vh; line-height: 1.4;
+  max-width: 31vw;
+  color: var(--ivoire);
+  text-shadow: 0 .2vh .6vh rgba(0,0,0,.95), 0 0 2vh rgba(0,0,0,.7);
+}
+
+/* ---------- Parchemin ----------
+   Toutes les tailles sont en « em » : 1em = 1 % de la hauteur du parchemin.
+   Il suffit de changer font-size pour tout agrandir/réduire d'un bloc,
+   le filet décoratif reste centré entre « Proclamation » et le titre. */
+
+#parchemin {
+  position: absolute; right: var(--marge-x); top: 8.5vh;
+  font-size: .71vh;             /* hauteur du parchemin = 71vh */
+  height: 100em; width: 80em;
+  background: url(images/ui/parchemin.webp) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 2vh 3vh rgba(0,0,0,.65));
+  animation: apparition-parchemin 1.8s .3s ease-out both, flotte 9s 2.1s ease-in-out infinite;
+  transform-origin: 50% 0%;
+}
+.parchemin-contenu {
+  position: absolute; top: 9.5%; bottom: 15%; left: 15.5%; right: 15.5%;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: space-between; /* l'espace libre est réparti entre les blocs */
+  text-align: center;
+  color: var(--parchemin-texte);
+}
+.p-entete { display: flex; flex-direction: column; align-items: center; width: 100%; }
+/* Filet doré sous « Proclamation » (extrait du parchemin d'origine, devenu mobile) */
+.p-filet-haut { display: block; width: 46.7em; height: auto; margin: .7em 0 .9em; }
+.p-surtitre {
+  font-family: "Cinzel", serif; font-weight: 700;
+  font-size: 1.9em; letter-spacing: .35em; text-transform: uppercase;
+  color: var(--encre-rouge);
+}
+.p-titre {
+  font-family: "Cinzel Decorative", serif; font-weight: 700;
+  font-size: 5.21em; line-height: 1.05; text-transform: uppercase;
+  color: var(--encre);
+  text-shadow: 0 1px 0 rgba(255,240,200,.5);
+}
+.p-soustitre {
+  font-family: "Cinzel", serif; font-weight: 600;
+  font-size: 2.68em; letter-spacing: .12em; text-transform: uppercase;
+  color: #5a3618;
+}
+.p-date { display: flex; flex-direction: column; align-items: center; }
+#t-date {
+  font-family: "Cinzel", serif; font-weight: 700;
+  font-size: 3.24em; color: var(--encre-rouge); letter-spacing: .04em;
+}
+.p-heure, .p-lieu { font-style: italic; font-size: 2.75em; line-height: 1.3; }
+.p-filet {
+  width: 60%; height: 1.97em; flex: 0 0 auto;
+  background:
+    linear-gradient(rgba(90,54,24,.55), rgba(90,54,24,.55)) left center / 42% 1px no-repeat,
+    linear-gradient(rgba(90,54,24,.55), rgba(90,54,24,.55)) right center / 42% 1px no-repeat;
+  position: relative;
+}
+.p-filet:after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 1.27em; height: 1.27em; margin: -.63em 0 0 -.63em;
+  background: var(--encre-rouge); transform: rotate(45deg);
+}
+.p-lignes { width: 100%; }
+.p-lignes .ligne { display: flex; align-items: baseline; justify-content: space-between; padding: .36em 0; border-bottom: 1px dotted rgba(90,54,24,.35); }
+.p-lignes dt {
+  font-family: "Cinzel", serif; font-weight: 700;
+  font-size: 1.83em; letter-spacing: .14em; text-transform: uppercase;
+  color: #7a4a22; text-align: left; margin-right: 1.15em; white-space: nowrap;
+}
+.p-lignes dd { font-size: 2.61em; text-align: right; line-height: 1.25; }
+.a-preciser { font-style: italic; opacity: .55; }
+.p-paragraphes { width: 100%; font-size: 2.46em; line-height: 1.32; text-align: center; }
+.p-paragraphes p + p { margin-top: .45em; }
+.p-regles { list-style: none; width: 100%; text-align: left; font-size: 2.46em; }
+.p-regles li { position: relative; padding-left: 1.26em; line-height: 1.25; margin-bottom: .1em; }
+.p-regles li:before {
+  content: ""; position: absolute; left: .23em; top: .4em;
+  width: .43em; height: .43em; transform: rotate(45deg);
+  border: 1px solid var(--encre-rouge); background: rgba(110,36,20,.25);
+}
+.p-pied {
+  font-style: italic; font-size: 2.61em; color: var(--encre-rouge);
+}
+.p-discord {
+  margin-top: .4em;
+  font-family: "Cinzel", serif; font-weight: 700; font-size: 2.11em; letter-spacing: .08em;
+  color: #5a3618;
+}
+.p-discord:empty { display: none; }
+
+@keyframes flotte {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50%     { transform: translateY(-.7vh) rotate(.35deg); }
+}
+@keyframes apparition-parchemin {
+  from { opacity: 0; transform: translateY(-3vh) scaleY(.92); }
+  to   { opacity: 1; transform: translateY(0) scaleY(1); }
+}
+@keyframes apparition { from { opacity: 0; transform: translateY(1.5vh); } to { opacity: 1; transform: translateY(0); } }
+
+/* ---------- Musique ---------- */
+
+#musique {
+  /* aligné sur le bord droit visible du parchemin (8,25 % de sa largeur = marge transparente de l'image) */
+  position: absolute; right: calc(var(--marge-x) + 56.8vh * .0825); top: 2.4vh;
+  display: flex; align-items: center;
+  padding: .6vh .7vh .6vh .6vh;
+  background: rgba(10, 9, 22, .6);
+  border: 1px solid rgba(233,185,85,.45);
+  border-radius: 99px;
+  color: var(--ivoire);
+  transition: border-color .3s, background .3s;
+  animation: apparition 1.6s .6s ease-out both;
+}
+#musique:hover { border-color: var(--or); background: rgba(24, 18, 40, .75); }
+#musique[hidden], #m-suivante[hidden] { display: none; }
+#musique button {
+  display: flex; align-items: center;
+  background: none; border: 0; padding: 0; margin: 0;
+  color: inherit; font: inherit; text-align: left;
+  cursor: pointer; outline: none;
+}
+#m-basculer { padding-right: 0; }
+#m-basculer .m-eq { margin-right: 1.2vh; } /* espace entre les barres de son et le bouton suivant */
+/* Bouton « piste suivante » */
+#m-suivante {
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 3.4vh; height: 3.4vh; margin-left: 1.8vh; /* bien séparé des barres de son */
+  border: 1px solid rgba(233,185,85,.45) !important;
+  border-radius: 50%;
+  transition: border-color .25s, box-shadow .25s, background .25s;
+}
+#m-suivante svg { width: 1.5vh; height: 1.5vh; fill: var(--or); margin-left: .15vh; }
+#m-suivante:hover { border-color: var(--or) !important; background: rgba(233,185,85,.12); box-shadow: 0 0 1.2vh rgba(233,185,85,.45); }
+#m-suivante:active { transform: scale(.92); }
+.m-artiste { font-style: normal; font-size: .85em; color: rgba(233,185,85,.85); }
+.m-icone { position: relative; width: 4.2vh; height: 4.2vh; margin-right: 1.2vh; }
+.m-icone img { position: absolute; top: -18%; left: -18%; width: 136%; height: 136%; opacity: .8; animation: tourne 20s linear infinite; }
+.m-icone svg {
+  position: absolute; top: 50%; left: 50%; width: 2.1vh; height: 2.1vh; margin: -1.05vh 0 0 -1.05vh;
+  fill: var(--or); stroke: var(--or); stroke-width: 1.8; stroke-linecap: round;
+}
+.m-icone svg .onde, .m-icone svg .barre { fill: none; }
+.m-off { display: none; }
+.m-texte { display: flex; flex-direction: column; align-items: flex-start; margin-right: 1.4vh; }
+.m-label { font-family: "Cinzel", serif; font-weight: 700; font-size: 1.05vh; letter-spacing: .25em; text-transform: uppercase; color: var(--or); }
+.m-titre { font-style: italic; font-size: 1.75vh; max-width: 30vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m-eq { display: flex; align-items: flex-end; height: 1.8vh; flex: 0 0 auto; }
+.m-eq i { width: .35vh; margin-left: .3vh; background: var(--or); border-radius: 1px; height: 30%; animation: eq 1s ease-in-out infinite; }
+.m-eq i:nth-child(2) { animation-delay: -.3s; animation-duration: .8s; }
+.m-eq i:nth-child(3) { animation-delay: -.6s; animation-duration: 1.2s; }
+.m-eq i:nth-child(4) { animation-delay: -.15s; animation-duration: .9s; }
+@keyframes eq { 0%,100% { height: 25%; } 50% { height: 100%; } }
+
+body.muet .m-on { display: none; }
+body.muet .m-off { display: block; }
+body.muet .m-icone img, body.muet .m-eq i, body.sans-son .m-icone img, body.sans-son .m-eq i { animation-play-state: paused; }
+body.muet .m-eq, body.sans-son .m-eq { opacity: .35; }
+
+/* ---------- Bas d'écran ---------- */
+
+#bas {
+  position: absolute; left: var(--marge-x); right: var(--marge-x); bottom: 5vh;
+  display: flex; align-items: flex-end;
+  animation: apparition 1.6s .4s ease-out both;
+}
+
+#chroniques {
+  position: relative;
+  width: 28vw; flex: 0 0 auto;
+  margin-right: 3vw;
+  padding: 1.6vh 2.2vh 1.4vh;
+  background: linear-gradient(135deg, rgba(14,12,30,.78), rgba(8,8,20,.6));
+  border: 1px solid rgba(233,185,85,.35);
+  box-shadow: inset 0 0 0 .35vh rgba(8,8,20,.6), inset 0 0 0 calc(.35vh + 1px) rgba(233,185,85,.18), 0 1vh 3vh rgba(0,0,0,.45);
+}
+#chroniques:before, #chroniques:after {
+  content: ""; position: absolute; width: 1.6vh; height: 1.6vh; border: 2px solid var(--or);
+}
+#chroniques:before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+#chroniques:after  { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+.c-label {
+  display: flex; align-items: center;
+  font-family: "Cinzel", serif; font-weight: 700;
+  font-size: 1.3vh; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--or);
+}
+.c-label img { width: 2.2vh; height: 2.2vh; margin-right: 1vh; animation: tourne 30s linear infinite; }
+.c-texte {
+  margin-top: .9vh;
+  min-height: 9.2vh; /* 3 lignes */
+  font-size: 2.15vh; line-height: 1.42;
+  color: var(--ivoire);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.c-texte.sortie { opacity: 0; transform: translateY(.6vh); }
+.c-temps { margin-top: 1vh; height: 1px; background: rgba(233,185,85,.18); }
+.c-temps span { display: block; height: 100%; width: 0; background: var(--or); box-shadow: 0 0 .6vh var(--or); }
+
+#progression { flex: 1; min-width: 0; padding-bottom: .3vh; }
+.pr-tete { display: flex; align-items: baseline; justify-content: space-between; padding: 0 5.6vh 1vh; }
+#pr-etape {
+  flex: 1; min-width: 0; margin-right: 2vh;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: "Cinzel", serif; font-weight: 600;
+  font-size: 1.95vh; letter-spacing: .06em;
+  color: #f0ddb0; text-shadow: 0 0 1vh rgba(0,0,0,.9);
+  transition: opacity .5s;
+}
+#pr-pourcent {
+  font-family: "Cinzel Decorative", serif; font-weight: 700;
+  font-size: 2.7vh; color: var(--or-clair); white-space: nowrap;
+  text-shadow: 0 0 1.2vh rgba(233,185,85,.6);
+}
+
+.pr-barre { display: flex; align-items: center; }
+.pr-embout {
+  width: 5.2vh; height: 5.2vh; flex: 0 0 auto;
+  filter: drop-shadow(0 0 .7vh rgba(233,185,85,.8));
+}
+.pr-embout.g { animation: tourne 26s linear infinite; margin-right: .4vh; }
+.pr-embout.d { animation: tourne-inverse 26s linear infinite; margin-left: .4vh; }
+
+.pr-rail {
+  position: relative; flex: 1;
+  height: 2.3vh;
+  border: 1px solid #c99c45;
+  border-radius: .3vh;
+  background:
+    repeating-linear-gradient(90deg, rgba(233,185,85,.06) 0 1px, transparent 1px 2.4vh),
+    linear-gradient(#0c0a18, #17122a 60%, #0c0a18);
+  box-shadow: inset 0 .3vh .8vh rgba(0,0,0,.85), 0 0 0 .35vh rgba(10,8,20,.85), 0 0 0 calc(.35vh + 1px) rgba(233,185,85,.45), 0 .8vh 2vh rgba(0,0,0,.6);
+}
+.pr-remplissage {
+  position: absolute; top: 0; left: 0; bottom: 0;
+  width: 0%;
+  overflow: hidden;
+  border-radius: .2vh;
+  background:
+    linear-gradient(to bottom, rgba(255,240,190,.55), rgba(255,240,190,0) 45%, rgba(80,40,0,.45)),
+    url(images/ui/texture-or.jpg) left center / 24vh;
+  box-shadow: 0 0 1.4vh rgba(255,190,80,.55);
+  transition: width .25s linear;
+}
+.pr-reflet {
+  position: absolute; top: 0; bottom: 0; left: -30%; width: 30%;
+  background: linear-gradient(100deg, rgba(255,255,255,0), rgba(255,250,220,.55), rgba(255,255,255,0));
+  animation: reflet 2.8s ease-in-out infinite;
+}
+@keyframes reflet { from { left: -30%; } to { left: 110%; } }
+.pr-etincelle {
+  position: absolute; top: 50%; left: 0%;
+  width: 4.6vh; height: 4.6vh; margin: -2.3vh 0 0 -2.3vh;
+  background: radial-gradient(circle, rgba(255,250,225,1) 0%, rgba(255,214,120,.85) 18%, rgba(233,150,40,.35) 42%, rgba(233,150,40,0) 70%);
+  border-radius: 50%;
+  animation: etincelle 1.3s ease-in-out infinite;
+  transition: left .25s linear;
+  pointer-events: none;
+}
+@keyframes etincelle { 0%,100% { transform: scale(.85); opacity: .85; } 50% { transform: scale(1.12); opacity: 1; } }
+
+.pr-pied { display: flex; justify-content: space-between; padding: 1.1vh 5.6vh 0; }
+#pr-fichier {
+  flex: 1; min-width: 0; margin-right: 2vh;
+  font-style: italic; font-size: 1.7vh;
+  color: rgba(243,231,204,.72);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#pr-compteur {
+  font-family: "Cinzel", serif; font-weight: 600;
+  font-size: 1.45vh; letter-spacing: .08em;
+  color: rgba(233,185,85,.85);
+  white-space: nowrap;
+}
+
+#serveur {
+  position: absolute; left: 0; right: 0; bottom: 1.4vh;
+  text-align: center;
+  font-family: "Cinzel", serif; font-weight: 400;
+  font-size: 1.2vh; letter-spacing: .3em; text-transform: uppercase;
+  color: rgba(243,231,204,.42);
+}
+
+/* ---------- Écrans moins larges que 16:9 (16:10, 4:3, 5:4) ---------- */
+@media (max-aspect-ratio: 16/10) {
+  .sceau { width: 20vh; height: 20vh; margin-right: calc(3.8vh + 2.6vh); }
+  #entete { left: calc(var(--marge-x) + 3.8vh); max-width: 60vw; }
+  h1#titre { font-size: 6.4vh; }
+  .message { max-width: 38vw; font-size: 2.1vh; }
+  /* le parchemin descend sous l'en-tête et rétrécit d'un bloc */
+  #parchemin { font-size: .55vh; top: 24vh; }
+  #musique { right: calc(var(--marge-x) + 44vh * .0825); }
+  /* les chroniques remontent à gauche, la barre prend toute la largeur */
+  #chroniques { position: absolute; left: 0; bottom: calc(100% + 4vh); width: 44vw; margin: 0; }
+}
+@media (max-aspect-ratio: 4/3) {
+  .devise { font-size: 1.7vh; }
+  .message { display: none; }
+  .filet { display: none; }
+}
